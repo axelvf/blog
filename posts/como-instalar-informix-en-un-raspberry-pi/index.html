@@ -1,0 +1,123 @@
+<!doctype html><html lang=en><head><title>Como instalar Informix en un Raspberry PI ::
+Sysarmy — El blog de quienes dan soporte</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Ésta es una receta para instalar Informix Dynamic Server Developer Edition en una RaspberryPi utilizando raw devices (Como somos sysadmines, queremos raw devices).
+Se me ocurrió realizar esta guía dado que Informix es un excelente motor de base de datos y poco conocido o que goza de la reputación de “misterioso”, entonces, para aprender Informix, que mejor que una RaspberryPi, un poco de tiempo y las ganas de aprender algo nuevo !"><meta name=keywords content="sysadmin,sistemas,desarrollo,developer,administración de sistemas,administrador de sistemas,linux,cloud,docker,kubernetes"><meta name=robots content="noodp"><link rel=canonical href=https://sysarmy.com/blog/posts/como-instalar-informix-en-un-raspberry-pi/><link rel=stylesheet href=https://sysarmy.com/blog/assets/style.css><link rel=stylesheet href=https://sysarmy.com/blog/style.css><link rel=apple-touch-icon-precomposed sizes=144x144 href=https://sysarmy.com/blog/img/apple-touch-icon-144-precomposed.png><link rel="shortcut icon" href=https://sysarmy.com/blog/img/favicon.png><link href=https://sysarmy.com/blog/assets/fonts/Inter-Italic.woff2 rel=preload type=font/woff2 as=font crossorigin><link href=https://sysarmy.com/blog/assets/fonts/Inter-Regular.woff2 rel=preload type=font/woff2 as=font crossorigin><link href=https://sysarmy.com/blog/assets/fonts/Inter-Medium.woff2 rel=preload type=font/woff2 as=font crossorigin><link href=https://sysarmy.com/blog/assets/fonts/Inter-MediumItalic.woff2 rel=preload type=font/woff2 as=font crossorigin><link href=https://sysarmy.com/blog/assets/fonts/Inter-Bold.woff2 rel=preload type=font/woff2 as=font crossorigin><link href=https://sysarmy.com/blog/assets/fonts/Inter-BoldItalic.woff2 rel=preload type=font/woff2 as=font crossorigin><meta name=description content="Sysarmy - Comunidad de sistemas"><meta name=keywords content="sysadmin,sistemas,desarrollo,developer,administración de sistemas,administrador de sistemas,linux,cloud,docker,kubernetes,"><meta name=author content="sysarmy"><meta property="fb:admins" content="218813981488432"><meta name=twitter:card content="summary_large_image"><meta name=twitter:site content="@sysarmy"><meta name=twitter:creator content="@sysarmy"><title>Como instalar Informix en un Raspberry PI</title><meta property="og:title" content="Como instalar Informix en un Raspberry PI"><meta property="twitter:title" content="Como instalar Informix en un Raspberry PI"><meta property="og:type" content="article"><meta property="article:published_time" content="2015-09-07"><meta property="og:description" content="Sysarmy - Comunidad de sistemas"><meta property="twitter:description" content="Sysarmy - Comunidad de sistemas"><meta name=description content="Sysarmy - Comunidad de sistemas"><meta property="og:url" content="https://sysarmy.com/blog/posts/como-instalar-informix-en-un-raspberry-pi/"><meta property="og:site_name" content="sysarmy"><meta property="og:image" content="https://sysarmy.com/blog//assets/raspberrypi4.jpg"><meta property="twitter:image" content="https://sysarmy.com/blog//assets/raspberrypi4.jpg"><meta property="og:tags" content="sysarmy"><meta property="og:tags" content="raspberrypi"><meta property="og:tags" content="raspberry"><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-MW9RRK2');</script></head><body class=dark-theme><div class=container><header class=header><span class=header__inner><a href=/blog class=logo style=text-decoration:none><span class=logo__mark><svg xmlns="http://www.w3.org/2000/svg" class="greater-icon" viewBox="0 0 44 44"><path fill="none" d="M15 8l14.729 14.382L15 35.367"/></svg></span><span class=logo__text>sysarmy:~ blog$</span>
+<span class=logo__cursor></span></a><span class=header__right><nav class=menu><ul class="menu__inner menu__inner--desktop"><li><a href=https://tienda.sysarmy.com/>Tienda</a></li><li><a href=https://www.youtube.com/channel/UCPE3EUzO58EBHzrJp2Fv7_A>Youtube</a></li></ul><ul class="menu__inner menu__inner--mobile"><li><a href=https://tienda.sysarmy.com/>Tienda</a></li><li><a href=https://www.youtube.com/channel/UCPE3EUzO58EBHzrJp2Fv7_A>Youtube</a></li></ul></nav><span class=menu-trigger><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></span><span class=theme-toggle><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 41C32.4934 41 41 32.4934 41 22 41 11.5066 32.4934 3 22 3 11.5066 3 3 11.5066 3 22s8.5066 19 19 19zM7 22C7 13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22z"/></svg></span></span></span></header><div class=content><div class=post><h1 class=post-title>Como instalar Informix en un Raspberry PI</h1><div class=post-meta><span class=post-date>September 7, 2015</span>
+<span class=post-read-time>— 6 minutos de lectura aprox.</span></div><span class=post-tags><a href=https://sysarmy.com/blog/tags/sysarmy/>#sysarmy</a>&nbsp;
+<a href=https://sysarmy.com/blog/tags/raspberrypi/>#raspberrypi</a>&nbsp;
+<a href=https://sysarmy.com/blog/tags/raspberry/>#raspberry</a>&nbsp;</span><figure class=post-cover><img src=https://sysarmy.com/blog/assets/raspberrypi4.jpg alt="Como instalar Informix en un Raspberry PI"></figure><div class=post-content><base href=https://sysarmy.com/blog/><p>Ésta es una receta para instalar Informix Dynamic Server Developer Edition en una RaspberryPi utilizando raw devices (Como somos sysadmines, queremos raw devices).</p><p>Se me ocurrió realizar esta guía dado que Informix es un excelente motor de base de datos y poco conocido o que goza de la reputación de “misterioso”, entonces, para aprender Informix, que mejor que una RaspberryPi, un poco de tiempo y las ganas de aprender algo nuevo !</p><p>Prerequisitos:</p><ul><li>RaspberryPi modelo B</li><li>Por lo menos una SD para el sistema operativo de la RaspberryPi y un pendrive de ocho gigas para los raw devices. Recomendable: una SD para el booteo, un pendrive para el sistema operativo y otro pendrive para la base de datos. Esta última configuración es la que vamos a usar en este tutorial.</li><li>Como sistema operativo se utiliza raspbian con los paquetes libaio1 y lvm2 instalados a mano, ya que no vienen instalados por defecto.</li><li>El Informix propiamente dicho, <strong>Informix Developer Edition for Linux ARM v6 32 (Raspberry PI) Version 10UC4DE</strong>, (es un tar llamado ids.12.10.UC4DE.Linux-ARM6.tar) desde <strong><a href="https://www-01.ibm.com/marketing/iwm/iwm/web/reg/pick.do?source=ifxids&lang=en_US" target=_blank>el sitio de IBM</a></strong> . Hay que registrarse como usuario para obtener el IbmId, son sólo 5 minutos.</li></ul><p><strong>Instalación</strong></p><p>Parto de la base que tenes la raspi instalada con raspbian, funcionando, y con acceso de root. Antes que nada hay que instalar dos paquetes que no vienen instalados por defecto: <strong>libaio1</strong> y <strong>lvm2</strong>.</p><p><em>Consideraciones: En mi raspi tengo dos pendrive y una SD, como les había contado antes. Así que, seguramente el nombre del dispositivo asociado al pendrive va a ser distinto (se puede copiar, reemplazar y pegar también)</em></p><p><strong><em>Como root:</em></strong></p><pre>apt-get install libaio1
+apt-get install lvm2</pre><p>Una vez agregados los paquetes: vamos a crear el grupo y usuario Informix.</p><pre>addgroup informix
+adduser --ingroup informix Informix</pre><p>Vamos a preparar el almacenamiento para la base de datos (los famosos raw devices):</p><p>Primero, vamos a determinar cuál es nuestro pendrive, que vamos a utilizar para nuestra base creándole los raw devices:</p><p>Ejecutamos dmesg para ver nuestro pendrive</p><pre><em>[ 4.766035] scsi 1:0:0:0: Direct-Access Kingston DataTraveler 2.0 1.00 PQ: 0 ANSI: 4</em>
+<em>[ 4.780904] sd 1:0:0:0: [sdb] 15148608 512-byte logical blocks: (7.75 GB/7.22 GiB)</em>
+<em>[ 4.794613] sd 1:0:0:0: [sdb] Write Protect is off</em>
+<em>[ 4.840400] sd 1:0:0:0: [sdb] Attached SCSI removable disk</em>
+</pre><p>Ya sabemos que es <em><strong>sdb</strong></em>. Entonces procedamos a armar los raw devices.</p><p>Antes que nada, el proceso en sí mismo, conceptualmente es: generar logical volumes sobre el pendrive y despues, sobre cada uno de los lv's generar un raw device.</p><p>Creamos los logical volume</p><pre>root@raspberrypi:~# <strong>pvcreate /dev/sdb</strong>
+Writing physical volume data to disk "/dev/sdb"
+Physical volume "/dev/sdb" successfully created
+root@raspberrypi:~# <strong>vgcreate vginformix /dev/sdb</strong>
+Volume group "vginformix" successfully created
+root@raspberrypi:~# <strong>lvcreate -n lvrootdbs -L +500M vginformix</strong>
+Logical volume "lvrootdbs" created
+root@raspberrypi:~# <strong>lvcreate -n lvdatadbs00 -L +2G vginformix</strong>
+Logical volume "lvdatadbs00" created
+root@raspberrypi:~#<strong> lvcreate -n lvdatadbs01 -L +2G vginformix</strong>
+Logical volume "lvdatadbs01" created
+root@raspberrypi:~# <strong>lvcreate -n lvtempdbs00 -L +500M vginformix</strong>
+Logical volume "lvtempdbs00" created
+root@raspberrypi:~# <strong>lvcreate -n lvlogsdbs -L +500M vginformix</strong>
+Logical volume "lvlogsdbs" created
+</pre><p><em>Chequeamos que hayan sido creados bien.</em></p><pre>root@raspberrypi:~# <strong>lvs</strong>
+LV          VG         Attr     LSize   Pool Origin Data%  Move Log Copy%  Convert
+lvdatadbs00 vginformix -wi-a---   2.00g
+lvdatadbs01 vginformix -wi-a---   2.00g
+lvlogsdbs   vginformix -wi-a--- 500.00m
+lvrootdbs   vginformix -wi-ao-- 500.00m
+lvtempdbs00 vginformix -wi-a--- 500.00m
+</pre><p><em>Generamos los raw devices</em>.</p><pre>root@raspberrypi:~# <strong>raw /dev/raw/raw1 /dev/vginformix/lvrootdbs</strong>
+root@raspberrypi:~# /dev/raw/raw1:  bound to major 254, minor 0
+root@raspberrypi:~# <strong>raw /dev/raw/raw2 /dev/vginformix/lvdatadbs00</strong>
+root@raspberrypi:~# /dev/raw/raw2:  bound to major 254, minor 1
+root@raspberrypi:~# <strong>raw /dev/raw/raw3 /dev/vginformix/lvdatadbs01</strong>
+root@raspberrypi:~# /dev/raw/raw3:  bound to major 254, minor 2
+root@raspberrypi:~# <strong>raw /dev/raw/raw4 /dev/vginformix/lvtempdbs00</strong>
+root@raspberrypi:~# /dev/raw/raw4:  bound to major 254, minor 3
+root@raspberrypi:~# <strong>raw /dev/raw/raw5 /dev/vginformix/lvlogsdbs</strong>
+root@raspberrypi:~# /dev/raw/raw5:  bound to major 254, minor 4
+</pre><p>Una vez generados los raw devices, tenemos que cambiarles el propietario y los permisos de acceso, y luego verificamos que haya quedado todo bien. (es muy importante tomar nota del nombre de los raw)</p><pre>root@raspberrypi:~# <strong>chown informix.informix /dev/raw/raw[0-9]</strong>
+root@raspberrypi:~# <strong>chmod 660 /dev/raw/raw[0-9]</strong>
+root@raspberrypi:~# <strong>ls -la /dev/raw</strong>
+
+total 0
+drwxr-xr-x  2 root     root        160 Jun 20 12:43 .
+drwxr-xr-x 14 root     root       3380 Jun 20 12:41 ..
+crw-rw----  1 informix informix 162, 1 Jun 20 12:38 raw1
+crw-rw----  1 informix informix 162, 2 Jun 20 00:31 raw2
+crw-rw----  1 informix informix 162, 3 Jun 20 00:31 raw3
+crw-rw----  1 informix informix 162, 4 Jun 20 00:32 raw4
+crw-rw----  1 informix informix 162, 5 Jun 20 12:43 raw5
+crw-------  1 root     root     162, 0 Dec 31  1969 rawctl
+</pre><p>Ahora viene la parte de instalación del motor de base de datos.</p><p>Antes que nada, es conveniente mover y descomprimir el archivo de instalación de Informix en un directorio temporal.</p><pre><strong>mv ids.12.10.UC4DE.Linux-ARM6.tar /tmp</strong>
+<strong>cd /tmp</strong>
+<strong>tar xvf ids.12.10.UC4DE.Linux-ARM6.tar</strong>
+</pre><p>Vamos a encontrar el archivo <strong>ids_install</strong>. Ese archivo es el ejecutable de nuestro asistente de instalación.</p><pre>root@raspberrypi:/tmp# ls -la
+total 910192
+drwxrwxrwt  6 root root        4096 Jun 20 00:32 .
+drwxr-xr-x 22 root root        4096 May 29 23:59 ..
+drwxr-xr-x  2 root daemon      4096 Dec 17  2014 doc
+drwxrwxrwt  2 root root        4096 Jun 19 22:17 .ICE-unix
+-rw-r--r--  1 root root   466042880 Jan  5 16:17 ids.12.10.UC4DE.Linux-ARM6.tar
+-rwx------  1 root root   465965056 Dec 18  2014 ids_install
+drwx------  2 root root        4096 Jun 20 00:12 mc-root
+drwxrwxrwt  2 root root        4096 Jun 19 22:17 .X11-unix
+</pre><p>Lo ejecutamos:</p><pre>root@raspberrypi:/tmp# <strong>./ids_install</strong>
+</pre><p>Nos aparecerá la siguiente pantalla:</p><pre>============================================
+Bundle Software
+============================================
+*
+* Texto de la licencia
+* 
+	1. Accept the license, 2. Decline the License, 3. Continue Reading.
+</pre><p>Aparecen los terminos de la licencia.</p><ul><li><strong>Y la aceptamos, presionando 1</strong></li></ul><p>Después nos aparece la pantalla de presentación de software a instalar, las opciones por defecto son las que nos sirven.</p><pre>============================================
+Informix Software Bundle
+============================================
+Select the Products to Install:
+
+[X] 1. 'Informix_Dynamic_Server'.
+[X] 2. 'Informix_JDBC'.
+[X] 3. 'Informix_ClientSDK'.
+[ ] 4. 'Informix_Connect'.
+
+============================================
+</pre><blockquote><p><strong>Informix Dynamic Server</strong> es el servidor propiamente dicho.<br><strong>Informix JDBC</strong> son los drivers de Informix para Java<br><strong>Informix ClientSDK</strong> es el sdk para programar aplicaciones cliente usando librerias de funciones nativas.</p></blockquote><p><strong>Apretamos ENTER para aceptar las opciones por defecto.</strong></p><pre>============================================
+Informix Software Bundle
+============================================
+*
+*
+*
+Specify a directory where to install the products:
+ENTER to proceed:<strong>/opt/IBM/informix</strong>
+</pre><p><em>En este punto, vamos a especificar el directorio de instalación a <strong>/opt/IBM/informix</strong> apretamos 1 para aceptar la licencia de IDS</em></p><p>Esperar un rato largo, servirse un café, una gaseosa, o lo que guste, mientras se instala el motor de base de datos.</p><p>Después aparece la instalación del SDK</p><pre>============================================
+Informix_ClientSDK
+============================================
+*
+* Texto de la licencia
+* 
+	1. Accept the license, 2. Decline the License, 3. Continue Reading.
+</pre><p>Cuando llegue el momento de instalar el SDK, <strong>volver a apretar 1 para aceptar la licencia</strong></p><p>Por último aparece ésta pantalla:</p><pre>============================================
+Informix_ClientSDK
+============================================
+*
+*
+* 
+	Installation was successful.
+============================================
+
+<em><strong>root@raspberrypi:/tmp#</strong></em>
+</pre><p>En la próxima entrega, les voy contar como configurar el motor de base de datos, crear la primera base y hacer nuestra primera consulta.</p><p>Saludos, y hasta la próxima</p><div class=ve-desktop><ins class=dcmads style=display:inline-block;width:728px;height:90px data-dcm-placement=N410401.3634809SYSARMY.COMBLOG/B10464038.251052924 data-dcm-rendering-mode=iframe data-dcm-https-only data-dcm-resettable-device-id data-dcm-app-id><script src=https://www.googletagservices.com/dcm/dcmads.js></script></ins></div><div class=ve-mobile><ins class=dcmads style=display:inline-block;width:320px;height:50px data-dcm-placement=N410401.3634809SYSARMY.COMBLOG/B10464038.250920272 data-dcm-rendering-mode=iframe data-dcm-https-only data-dcm-resettable-device-id data-dcm-app-id><script src=https://www.googletagservices.com/dcm/dcmads.js></script></ins></div><script>if(window.innerWidth<960){var divsToHide=document.getElementsByClassName("ve-desktop");for(var i=0;i<divsToHide.length;i++){divsToHide[i].style.visibility="hidden";divsToHide[i].style.display="none";}}else{var divsToHide=document.getElementsByClassName("ve-mobile");for(var i=0;i<divsToHide.length;i++){divsToHide[i].style.visibility="hidden";divsToHide[i].style.display="none";}}</script></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Leer otros posts</span><hr></div><div class=pagination__buttons><span class="button previous"><a href=https://sysarmy.com/blog/posts/configurando-y-usando-informix-en-raspberry-pi/><span class=button__icon>←</span>
+<span class=button__text>Configurando y usando Informix en Raspberry PI</span></a></span>
+<span class="button next"><a href=https://sysarmy.com/blog/posts/feliz-dia-del-admin/><span class=button__text>Feliz día del Admin !</span>
+<span class=button__icon>→</span></a></span></div></div><div class=pagination><div class=pagination__title><span class=pagination__title-h>Comentarios</span><hr></div><div id=vanilla-comments></div><script type=text/javascript>var vanilla_forum_url='https://help.sysarmy.com/';var vanilla_identifier="https:\/\/sysarmy.com\/blog\/posts\/como-instalar-informix-en-un-raspberry-pi\/";var vanilla_title="Como instalar Informix en un Raspberry PI";var vanilla_category_id='11';(function(){var vanilla=document.createElement('script');vanilla.type='text/javascript';var timestamp=new Date().getTime();vanilla.src=vanilla_forum_url+'/js/embed.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(vanilla);})();</script><noscript>Please enable JavaScript to view the
+<a href=http://vanillaforums.com/?ref_noscript>comments powered by /Help.</a></noscript></div></div><footer class=footer><div class=footer__inner><a href=/blog class=logo style=text-decoration:none><span class=logo__mark><svg xmlns="http://www.w3.org/2000/svg" class="greater-icon" viewBox="0 0 44 44"><path fill="none" d="M15 8l14.729 14.382L15 35.367"/></svg></span><span class=logo__text>sysarmy:~ blog$</span>
+<span class=logo__cursor></span></a><div class=copyright><span>© 2021 Powered by
+<a href=https://gohugo.io target=_blank rel=noopener>Hugo</a></span>
+<span>Theme created by
+<a href=https://twitter.com/panr target=_blank rel=noopener>panr</a></span></div></div></footer><script src=https://sysarmy.com/blog/assets/main.js></script><script src=https://sysarmy.com/blog/assets/prism.js></script></div></body></html>
